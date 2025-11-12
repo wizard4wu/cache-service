@@ -1,0 +1,47 @@
+#maven
+.target/
+dependency-reduced-pom.xml
+pom.xml.versionsBackup
+.factorypath
+
+out/
+# macOS
+.DS_Store
+# Gradel
+.gradle/
+build/
+
+# IDEA
+.idea/
+*.ipr
+*.iml
+*.iws
+
+# temp ignore
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+*.class
+
+target/
+bin/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.project
+.settings
+.springBeans
+
+
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/

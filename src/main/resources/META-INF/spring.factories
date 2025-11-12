@@ -1,0 +1,3 @@
+#support springboot 2.x
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.dev.wizard.cache.config.RedisAutoConfig
