@@ -1,8 +1,6 @@
 package com.dev.wizard.cache.redis.inteface.impl;
 
-import com.dev.wizard.cache.redis.AbstractCache;
 import com.dev.wizard.cache.redis.JsonUtils;
-import com.dev.wizard.cache.redis.data.domain.Payload;
 import com.dev.wizard.cache.redis.inteface.RedisAbstractCache;
 import com.dev.wizard.cache.redis.inteface.RedisRawListCache;
 import org.springframework.data.redis.core.ListOperations;

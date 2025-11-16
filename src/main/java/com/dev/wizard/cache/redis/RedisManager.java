@@ -22,7 +22,7 @@ public class RedisManager {
     private StringRedisTemplate stringRedisTemplate;
 
 
-    public <T> T executeWithIdempotent(String key, long expireTimeSeconds, Supplier<T> supplierForBiz) {
+    public <T> T executeWithIdempotent(String key, long expireTimeMillSeconds, Supplier<T> supplierForBiz) {
         if (supplierForBiz == null) {
             throw new IllegalArgumentException("business logic supplier can not be null");
         }
@@ -31,8 +31,8 @@ public class RedisManager {
             log.warn("key is null or empty, executing business logic without idempotency guarantee");
             return supplierForBiz.get();
         }
-        final Boolean seted = expireTimeSeconds > 0
-                ? stringRedisTemplate.opsForValue().setIfAbsent(key, "1", expireTimeSeconds, TimeUnit.SECONDS)
+        final Boolean seted = expireTimeMillSeconds > 0
+                ? stringRedisTemplate.opsForValue().setIfAbsent(key, "1", expireTimeMillSeconds, TimeUnit.MILLISECONDS)
                 : stringRedisTemplate.opsForValue().setIfAbsent(key, "1");
         if (Boolean.TRUE.equals(seted)) {
             try {

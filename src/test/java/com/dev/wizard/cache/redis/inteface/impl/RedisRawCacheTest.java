@@ -5,20 +5,27 @@ import com.dev.wizard.cache.config.RedisAutoConfig;
 import com.dev.wizard.cache.domain.TestUser;
 import com.dev.wizard.cache.redis.MyRedisCache;
 import com.dev.wizard.cache.redis.anno.RedisCache;
+import com.dev.wizard.cache.redis.anno.RedisLock;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +42,10 @@ public class RedisRawCacheTest {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
-    @BeforeEach
+    @Autowired
+    private UserService userService;
+
+    //@BeforeEach
     void setUp() {
         // 清空测试数据，保证每次测试干净
         redisTemplate.getConnectionFactory().getConnection().flushDb();
@@ -56,6 +66,38 @@ public class RedisRawCacheTest {
         TestUser nullUser = preventCachePenetrationRedisCache.get(userKey, TestUser.class);
         assertNull(nullUser);
     }
+
+    @Test
+    public void testRedisLock() throws InterruptedException {
+
+        TestUser user = new TestUser(12345L, "name", Instant.now());
+
+        int threadCount = 10;
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                try {
+                    userService.createUser(user);  // 同一个 userId
+                } catch (Exception ignored) {}
+                finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        executor.shutdown();
+        // 断言只有 1 个线程成功进入临界区
+        System.out.println("最终调用次数 = " + userService.getCallCount());
+        Assertions.assertEquals(1, userService.getCallCount(),
+                "分布式锁失败，应当只有 1 个线程成功执行 createUser()");
+
+    }
+
+
+
 
 
     @Test
@@ -348,5 +390,21 @@ public class RedisRawCacheTest {
         assertThat(result3.get("k1")).isEqualTo(null);
         assertEquals(null, preventCachePenetrationRedisCache.get("k1", String.class));
 
+    }
+
+    @Service
+    public static class UserService {
+        private final AtomicInteger callCount = new AtomicInteger(0);
+
+        // 这里模拟实际业务：真实被锁保护的方法
+        @RedisLock(key = "'userId:' + #user.userId", tryLockTime = 100)
+        public void createUser(TestUser user) {
+            callCount.incrementAndGet();
+            System.out.println("执行 createUser: " + user.getUserId());
+            try { Thread.sleep(2000); } catch (Exception ignored) {}
+        }
+        public int getCallCount() {
+            return callCount.get();
+        }
     }
 }

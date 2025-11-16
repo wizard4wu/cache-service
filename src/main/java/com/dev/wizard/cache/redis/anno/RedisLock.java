@@ -15,7 +15,7 @@ public @interface RedisLock {
 
     String key();
 
-    long lockExpiredTime() default -1; //-1 help to enable watchdog
+    long lockExpiredTime() default -1; //-1 help to enable watchdog，unit is ms
 
-    long tryLockTime() default 10_000;
+    long tryLockTime() default 2_000;  //unit is ms
 }

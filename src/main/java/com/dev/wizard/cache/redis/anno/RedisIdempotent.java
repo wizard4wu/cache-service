@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 public @interface RedisIdempotent {
 
     String key();
-    long expireTime() default -1; // in seconds, -1 means no expiration
+    long expireTime() default 24 * 60 * 60 * 1000; // unit is ms, -1 means no expiration
 }

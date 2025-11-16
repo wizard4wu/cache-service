@@ -37,6 +37,6 @@ public class RedisCollectionCacheImpl implements CollectionCache {
 
     @Override
     public <V> RedisRawSortedSetCache<V> sortedSetCache(Class<V> clazz) {
-        return new RedisRedisRawSortedSetCacheImpl<>(redisTemplate.opsForZSet(), prefix, clazz, preventCachePenetration);
+        return new RedisRedisSortedSetCacheImpl<>(redisTemplate.opsForZSet(), prefix, clazz, preventCachePenetration);
     }
 }

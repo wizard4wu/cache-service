@@ -6,7 +6,6 @@ import com.dev.wizard.cache.redis.inteface.RedisAbstractCache;
 import com.dev.wizard.cache.redis.inteface.RedisRawSortedSetCache;
 import org.springframework.data.redis.core.*;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,13 +14,13 @@ import java.util.stream.Collectors;
  * Author: wizard.wu
  * Date: 2025/9/11 23:32
  */
-public class RedisRedisRawSortedSetCacheImpl<V> extends RedisAbstractCache implements RedisRawSortedSetCache<V> {
+public class RedisRedisSortedSetCacheImpl<V> extends RedisAbstractCache implements RedisRawSortedSetCache<V> {
 
     private ZSetOperations<String, String> operations;
     private Boolean preventCachePenetration;
     private Class<V> clazz;
 
-    public RedisRedisRawSortedSetCacheImpl(ZSetOperations<String, String> operations, String prefix, Class<V> clazz, Boolean preventCachePenetration) {
+    public RedisRedisSortedSetCacheImpl(ZSetOperations<String, String> operations, String prefix, Class<V> clazz, Boolean preventCachePenetration) {
         this.operations = operations;
         this.prefix = prefix;
         this.clazz = clazz;

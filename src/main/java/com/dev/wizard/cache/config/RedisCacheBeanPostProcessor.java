@@ -25,6 +25,7 @@ public class RedisCacheBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessBeforeInitialization(Object bean, String beanName) {
         Arrays.stream(bean.getClass().getDeclaredFields()).forEach(field -> {
             RedisCache redisCache = field.getAnnotation(RedisCache.class);
+            //此处可以做一个性能优化，当如果有相同的RedisCache时就不要重新new了
             if (null != redisCache) {
                 ReflectionUtils.makeAccessible(field);
                 MyRedisCache myCache = new MyAbstractRedisCache.Default(stringRedisTemplate, redisCache.value(), Boolean.TRUE.equals(redisCache.preventCachePenetration()));

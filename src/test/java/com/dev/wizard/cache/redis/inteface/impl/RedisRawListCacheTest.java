@@ -24,7 +24,6 @@ public class RedisRawListCacheTest {
     @RedisCache("test")
     private MyRedisCache redisCache;
 
-
     private RedisRawListCache<TestUser> listCache;
     @PostConstruct
     public void init() {
