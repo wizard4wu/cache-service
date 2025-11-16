@@ -33,7 +33,7 @@ import java.util.List;
  */
 @Configuration
 @EnableConfigurationProperties(RedisProperties.class)
-@ComponentScan("com.dev.wizard.cache.*")
+@ComponentScan("com.dev.wizard.cache")
 @EnableAspectJAutoProxy
 public class RedisAutoConfig {
 
